@@ -8,6 +8,9 @@ keywords = ["cli", "terminal", "console"]
 authors = ["Stefan Rabmund <sorcerersr@mailbox.org>"]
 readme = "README.md"
 edition = "2018"
+exclude = [
+    "screenshot",
+]
 
 [dependencies]
 console = "0.14.1"
