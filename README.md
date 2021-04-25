@@ -2,7 +2,7 @@
 
 ## Description
 
-A small utility crate using https://github.com/mitsuhiko/console to write 
+A small utility crate using https://crates.io/crates/console to write 
 to stdout but limited to a given number of lines. The oldest line is removed 
 when writing a new line.
 
@@ -37,6 +37,10 @@ fn main() {
 Screenshot showing above example in action
 
 ![Screenshot of example five.rs](screenshot/example_five.gif)
+
+Clearing the written lines afterwards (```cargo run --example clear```)
+
+![Screenshot of example clear.rs](screenshot/example_clear.gif)
 
 ## License
 

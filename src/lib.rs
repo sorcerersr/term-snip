@@ -35,7 +35,11 @@
 //!Screenshot showing above example in action
 //!
 //!![Screenshot of example five.rs](https://gitlab.com/sorcerersr/term-snip/-/raw/master/screenshot/example_five.gif)
-
+//!
+//!Clearing the written lines afterwards (```cargo run --example clear```)
+//!
+//!![Screenshot of example clear.rs](https://gitlab.com/sorcerersr/term-snip/-/raw/master/screenshot/example_clear.gif)
+//!
 
 use std::{io, usize};
 
@@ -78,4 +82,20 @@ impl TermSnip{
         }        
         Ok(())
     }
+
+    /// Clear the lines written with the TermSnip instance
+    pub fn clear_lines(&mut self) -> io::Result<()> {
+        let len = &self.lines.len();
+        self.term.move_cursor_up(*len)?;
+        
+        for _n in 0..*len {
+            self.term.clear_line()?;
+            self.term.move_cursor_down(1)?;
+        }
+        self.term.move_cursor_up(*len+1)?;
+        self.lines.clear();
+        self.term.move_cursor_down(1)?;
+        Ok(())
+    }
+
 }
