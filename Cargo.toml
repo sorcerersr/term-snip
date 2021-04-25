@@ -5,6 +5,7 @@ license = "MIT OR Apache-2.0"
 description = "Write limited number of lines to terminal"
 repository = "https://gitlab.com/sorcerersr/term-snip"
 keywords = ["cli", "terminal", "console"]
+categories = ["command-line-utilities"]
 authors = ["Stefan Rabmund <sorcerersr@mailbox.org>"]
 readme = "README.md"
 edition = "2018"
