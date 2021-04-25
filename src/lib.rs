@@ -70,6 +70,33 @@ impl TermSnip{
     /// Writes a line to the terminal (stdout).
     pub fn write_line(&mut self, text: &str) -> io::Result<()> {
 
+        // split text into multiple text when it is longer than a line
+        let line_len:usize = self.term.size().1.into();
+        
+        // if the char count of the text is less than the line length
+        // just write it and return
+        if text.chars().count() < line_len {
+            self.term_write_line(text)?;
+            return Ok(())
+        }
+        // when this code line is reached the text is larger then the line length
+        // and must be splitted to be written as multiple lines
+
+        let mut last_text = text;
+        while last_text.chars().count() >= line_len {
+            let (first, last) = last_text.split_at(line_len);
+            last_text = last;
+            self.term_write_line(first)?;
+        }
+        self.term_write_line(last_text)?;
+
+        Ok(())
+    }
+
+
+    /// Delegates the writing to console::Term and manages the line limit.
+    fn term_write_line(&mut self, text: &str) -> io::Result<()> {
+
         self.lines.push(text.to_string());
         if self.lines.len() > self.limit {
             self.term.move_cursor_up(self.limit)?;
@@ -81,7 +108,9 @@ impl TermSnip{
             self.term.write_line(text)?;
         }        
         Ok(())
+
     }
+
 
     /// Clear the lines written with the TermSnip instance
     pub fn clear_lines(&mut self) -> io::Result<()> {
