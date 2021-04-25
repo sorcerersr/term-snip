@@ -3,7 +3,7 @@
 ## Description
 
 A small utility crate using https://github.com/mitsuhiko/console to write 
-to stdout but limited to a given number if lines. The oldest line is removed 
+to stdout but limited to a given number of lines. The oldest line is removed 
 when writing a new line.
 
 ## Usage
