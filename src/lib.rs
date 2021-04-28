@@ -41,7 +41,7 @@
 //!![Screenshot of example clear.rs](https://gitlab.com/sorcerersr/term-snip/-/raw/master/screenshot/example_clear.gif)
 //!
 
-use std::{io, usize};
+use std::{collections::VecDeque, io, usize};
 
 use console::Term;
 
@@ -49,7 +49,7 @@ use console::Term;
 pub struct TermSnip {
     term: Term,
     limit: usize, 
-    lines: Vec<String>,
+    lines: VecDeque<String>,
     
 }
 
@@ -64,7 +64,7 @@ impl TermSnip{
     /// ```
     ///
     pub fn new(limit: usize) -> TermSnip {
-        TermSnip{ term: Term::stdout(), limit, lines: Vec::new()}
+        TermSnip{ term: Term::stdout(), limit, lines: VecDeque::new()}
     }
 
     /// Writes a line to the terminal (stdout).
@@ -96,11 +96,10 @@ impl TermSnip{
 
     /// Delegates the writing to console::Term and manages the line limit.
     fn term_write_line(&mut self, text: &str) -> io::Result<()> {
-
-        self.lines.push(text.to_string());
+        self.lines.push_back(text.to_string());
         if self.lines.len() > self.limit {
-            self.term.move_cursor_up(self.limit)?;
-            self.lines.remove(0);
+            self.lines.pop_front();
+            self.clear_lines()?;
             for line in &self.lines {
                 self.term.write_line(line)?;
             }
@@ -114,16 +113,7 @@ impl TermSnip{
 
     /// Clear the lines written with the TermSnip instance
     pub fn clear_lines(&mut self) -> io::Result<()> {
-        let len = &self.lines.len();
-        self.term.move_cursor_up(*len)?;
-        
-        for _n in 0..*len {
-            self.term.clear_line()?;
-            self.term.move_cursor_down(1)?;
-        }
-        self.term.move_cursor_up(*len+1)?;
-        self.lines.clear();
-        self.term.move_cursor_down(1)?;
+        self.term.clear_last_lines(self.lines.len())?;
         Ok(())
     }
 
