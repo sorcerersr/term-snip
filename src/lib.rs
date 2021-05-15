@@ -49,30 +49,10 @@ use console::Term;
 pub struct TermSnip {
     term: Term,
     limit: usize,
-    fill: bool,
     lines: VecDeque<String>,
 }
 
 impl TermSnip {
-    /// Creates a TermSnip wich limits output lines to the given limit and fills
-    /// lines up to the width of the terminal with spaces if fill parameter is
-    /// true.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// let mut term = TermSnip::new_with_fill(5, true);
-    /// ```
-    ///
-    pub fn new_with_fill(limit: usize, fill: bool) -> TermSnip {
-        TermSnip {
-            term: Term::stdout(),
-            limit,
-            fill,
-            lines: VecDeque::new(),
-        }
-    }
-
     /// Creates a TermSnip wich limits output lines to the given limit.
     ///
     /// # Example
@@ -85,7 +65,6 @@ impl TermSnip {
         TermSnip {
             term: Term::stdout(),
             limit,
-            fill: false,
             lines: VecDeque::new(),
         }
     }
@@ -97,7 +76,7 @@ impl TermSnip {
         // if the char count of the text is less than the line length
         // just write it and return
         if text.chars().count() < line_len {
-            self.write_short_line(text, line_len)?;
+            self.term_write_line(text)?;
             return Ok(());
         }
         // when this code line is reached the text is larger then the line length
@@ -110,22 +89,8 @@ impl TermSnip {
             self.term_write_line(first)?;
         }
 
-        self.write_short_line(last_text, line_len)?;
+        self.term_write_line(last_text)?;
 
-        Ok(())
-    }
-
-    /// Convenience method for writing a short line.
-    /// If the fill attribute is true and the line is shorter than the terminal
-    /// line length it is filled with spaces.
-    /// Done to workaround some strange issues when writing output of std::process
-    /// in some cases.
-    fn write_short_line(&mut self, text: &str, line_len: usize) -> io::Result<()> {
-        if self.fill && text.chars().count() <= line_len {
-            self.term_write_line(&format!("{:width$}", text, width = line_len))?;
-        } else {
-            self.term_write_line(text)?;
-        }
         Ok(())
     }
 
