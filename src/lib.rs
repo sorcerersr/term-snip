@@ -43,16 +43,17 @@
 
 use std::{collections::VecDeque, io, usize};
 
-use console::Term;
+mod termwrap;
+use termwrap::{ConsoleTermWrap, TermWrap};
 
 /// Representation of a terminal.
-pub struct TermSnip {
-    term: Term,
+pub struct TermSnip<'a> {
+    term: Box<dyn TermWrap + 'a>,
     limit: usize,
     lines: VecDeque<String>,
 }
 
-impl TermSnip {
+impl<'a> TermSnip<'a> {
     /// Creates a TermSnip wich limits output lines to the given limit.
     ///
     /// # Example
@@ -61,9 +62,9 @@ impl TermSnip {
     /// let mut term = TermSnip::new(5);
     /// ```
     ///
-    pub fn new(limit: usize) -> TermSnip {
+    pub fn new(limit: usize) -> TermSnip<'a> {
         TermSnip {
-            term: Term::stdout(),
+            term: Box::new(ConsoleTermWrap::new()),
             limit,
             lines: VecDeque::new(),
         }
@@ -113,5 +114,88 @@ impl TermSnip {
     pub fn clear_lines(&mut self) -> io::Result<()> {
         self.term.clear_last_lines(self.lines.len())?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use mockall::predicate::eq;
+
+    #[test]
+    fn test_simple_one_line() {
+        let mut termwrap_mock = termwrap::MockTermWrap::new();
+        termwrap_mock.expect_size().returning(|| (20, 20));
+        termwrap_mock
+            .expect_write_line()
+            .with(eq("test"))
+            .times(1)
+            .returning(|_x| Ok(()));
+
+        let mut term_snip = TermSnip {
+            term: Box::new(termwrap_mock),
+            limit: 5,
+            lines: VecDeque::new(),
+        };
+
+        term_snip.write_line("test").unwrap();
+    }
+
+    #[test]
+    fn test_six_lines_with_limit_5() {
+        let mut termwrap_mock = termwrap::MockTermWrap::new();
+        termwrap_mock.expect_size().returning(|| (20, 20));
+        // 10 calls to write_line are expected.
+        // what happens is:
+        // * lines 0,1,2,3,4 are written to terminal, limit of 5 is reached
+        // * next line is about to be written, after limit, so clear_lines is called
+        // * lines 1,2,3,4 are written again, so it looks like they are moving
+        //   up one line
+        // * line 5 is written
+        // in total 10 calls to write_line
+        termwrap_mock
+            .expect_write_line()
+            .times(10)
+            .returning(|_x| Ok(()));
+        termwrap_mock
+            .expect_clear_last_lines()
+            .with(eq(5))
+            .times(1)
+            .returning(|_x| Ok(()));
+
+        let mut term_snip = TermSnip {
+            term: Box::new(termwrap_mock),
+            limit: 5,
+            lines: VecDeque::new(),
+        };
+
+        // write six lines
+        for _n in 0..6 {
+            term_snip.write_line("test").unwrap();
+        }
+    }
+
+    #[test]
+    fn test_long_line_split() {
+        let mut termwrap_mock = termwrap::MockTermWrap::new();
+        // line length of terminal is mocked to 6
+        termwrap_mock.expect_size().returning(|| (20, 6));
+        // testcase is one long line that needs to be splitted to three lines
+        // due to its length
+        termwrap_mock
+            .expect_write_line()
+            .times(3)
+            .returning(|_x| Ok(()));
+
+        let mut term_snip = TermSnip {
+            term: Box::new(termwrap_mock),
+            limit: 5,
+            lines: VecDeque::new(),
+        };
+
+        // sample text is 17 chars long which should lead to
+        // three lines as line length is 6
+        let testline = "Lorem ipsum dolor";
+        term_snip.write_line(testline).unwrap();
     }
 }
