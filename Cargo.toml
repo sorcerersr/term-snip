@@ -1,6 +1,6 @@
 [package]
 name = "term-snip"
-version = "0.1.6"
+version = "0.1.7"
 license = "MIT OR Apache-2.0"
 description = "Write limited number of lines to terminal"
 repository = "https://gitlab.com/sorcerersr/term-snip"
