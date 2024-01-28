@@ -59,6 +59,7 @@ impl<'a> TermSnip<'a> {
     /// # Example
     ///
     /// ```rust
+    /// use term_snip::TermSnip;
     /// let mut term = TermSnip::new(5);
     /// ```
     ///
