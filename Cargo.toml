@@ -17,4 +17,5 @@ exclude = [
 console = "0.15.8"
 
 [dev-dependencies]
-mockall = "0.13.0"
+mockall = "0.13.1"
+
