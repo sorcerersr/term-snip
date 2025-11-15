@@ -1,7 +1,7 @@
 [![Build and Tests](https://github.com/sorcerersr/term-snip/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/sorcerersr/term-snip/actions/workflows/build_and_test.yml)
 [![codecov](https://codecov.io/gh/sorcerersr/term-snip/graph/badge.svg?token=L1XQZ9CXAK)](https://codecov.io/gh/sorcerersr/term-snip)
 [![crates.io](https://img.shields.io/crates/v/term-snip)](https://crates.io/crates/term-snip)
-[![docs.rs](https://img.shields.io/docsrs/term-snip/latest)](https://docs.rs/drives/latest/term-snip/)
+[![docs.rs](https://img.shields.io/docsrs/term-snip/latest)](https://docs.rs/term-snip/latest/term_snip/)
 
 
 # term-snip
@@ -56,4 +56,3 @@ Licensed under either of
  * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
-
